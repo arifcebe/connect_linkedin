@@ -1,35 +1,39 @@
 package com.arifcebe.connectlinkedin;
 
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.arifcebe.connectlinkedin.api.Webservice;
+import com.linkedin.platform.APIHelper;
 import com.linkedin.platform.LISession;
 import com.linkedin.platform.LISessionManager;
+import com.linkedin.platform.errors.LIApiError;
 import com.linkedin.platform.errors.LIAuthError;
+import com.linkedin.platform.listeners.ApiListener;
+import com.linkedin.platform.listeners.ApiResponse;
 import com.linkedin.platform.listeners.AuthListener;
 import com.linkedin.platform.utils.Scope;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Main";
+    TextView jsonText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-                try {
+        /*try {
             PackageInfo info = getPackageManager().getPackageInfo(
                     "com.arifcebe.connectlinkedin",
                     PackageManager.GET_SIGNATURES);
@@ -42,7 +46,9 @@ public class MainActivity extends AppCompatActivity {
 
         } catch (NoSuchAlgorithmException e) {
 
-        }
+        }*/
+
+        jsonText = (TextView) findViewById(R.id.main_json);
 
         Button btnClick = (Button) findViewById(R.id.main_btnClick);
         btnClick.setOnClickListener(new View.OnClickListener() {
@@ -53,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onAuthSuccess() {
                         // Authentication was successful.  You can now do
                         // other calls with the SDK.
-                        Log.d(TAG,"success otentikasi");
+                        Log.d(TAG, "success otentikasi");
                         setUpdateState();
                         Toast.makeText(getApplicationContext(), "success" + LISessionManager.getInstance(getApplicationContext()).getSession().getAccessToken().toString(), Toast.LENGTH_LONG).show();
                     }
@@ -61,7 +67,8 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onAuthError(LIAuthError error) {
                         // Handle authentication errors
-                        Log.d(TAG,"failed otentikasi "+error.toString());
+                        setUpdateState();
+                        Log.d(TAG, "failed otentikasi " + error.toString());
                     }
                 }, true);
             }
@@ -72,7 +79,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Add this line to your existing onActivityResult() method
-        LISessionManager.getInstance(getApplicationContext()).onActivityResult(this, requestCode, resultCode, data);
+        LISessionManager.getInstance(getApplicationContext())
+                .onActivityResult(this, requestCode, resultCode, data);
 
     }
 
@@ -85,10 +93,30 @@ public class MainActivity extends AppCompatActivity {
         LISession session = sessionManager.getSession();
         boolean accessTokenValid = session.isValid();
 
-       /* ((TextView) findViewById(R.id.at)).setText(
-                accessTokenValid ? session.getAccessToken().toString() : "Sync with LinkedIn to enable these buttons");
-        ((Button) findViewById(R.id.apiCall)).setEnabled(accessTokenValid);
-        ((Button) findViewById(R.id.deeplink)).setEnabled(accessTokenValid);*/
+        if(accessTokenValid){
+            APIHelper apiHelper = APIHelper.getInstance(this);
+            apiHelper.getRequest(this, Webservice.getInstance().getGetUrlPeopleProfile(), new ApiListener() {
+                @Override
+                public void onApiSuccess(ApiResponse apiResponse) {
+                    Log.d(TAG,"result success "+apiResponse.getResponseDataAsJson().toString());
+                    JSONObject jo = apiResponse.getResponseDataAsJson();
+                    try {
+                        //String status = jo.getString("StatusCode");
+                        String name = jo.getString("firstName");
+                        jsonText.setText(name);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                @Override
+                public void onApiError(LIApiError LIApiError) {
+                    jsonText.setText(LIApiError.getMessage().toString());
+                }
+            });
+        }
+
     }
 
 }

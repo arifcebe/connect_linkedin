@@ -7,24 +7,30 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.arifcebe.connectlinkedin.MainActivity">
+    tools:context=".view.MainActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:text="Hello.. Please Login first" />
 
-    <Button
+    <ImageView
         android:id="@+id/main_btnClick"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:text="Click me!"
-        android:layout_centerVertical="true"/>
+        android:layout_centerVertical="true"
+        android:src="@drawable/sign_in_linkedin"/>
 
     <TextView
         android:id="@+id/main_json"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello World!"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"/>
+
+
+
+
 </RelativeLayout>

@@ -1,29 +1,17 @@
-package com.arifcebe.connectlinkedin;
+package com.arifcebe.connectlinkedin.view;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.arifcebe.connectlinkedin.api.Webservice;
-import com.linkedin.platform.APIHelper;
-import com.linkedin.platform.LISession;
+import com.arifcebe.connectlinkedin.R;
+import com.arifcebe.connectlinkedin.view.iface.MainInterfac;
 import com.linkedin.platform.LISessionManager;
-import com.linkedin.platform.errors.LIApiError;
-import com.linkedin.platform.errors.LIAuthError;
-import com.linkedin.platform.listeners.ApiListener;
-import com.linkedin.platform.listeners.ApiResponse;
-import com.linkedin.platform.listeners.AuthListener;
-import com.linkedin.platform.utils.Scope;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainInterfac {
 
     private static final String TAG = "Main";
     TextView jsonText;
@@ -32,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.main_activity);
         /*try {
             PackageInfo info = getPackageManager().getPackageInfo(
                     "com.arifcebe.connectlinkedin",
@@ -48,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
         }*/
 
-        jsonText = (TextView) findViewById(R.id.main_json);
+        /*jsonText = (TextView) findViewById(R.id.main_json);
 
         Button btnClick = (Button) findViewById(R.id.main_btnClick);
         btnClick.setOnClickListener(new View.OnClickListener() {
@@ -72,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }, true);
             }
-        });
+        });*/
 
     }
 
@@ -84,7 +72,22 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private static Scope buildScope() {
+    @Override
+    public void fetchProfile(JSONObject jo) {
+
+    }
+
+    @Override
+    public void processLogin() {
+
+    }
+
+    @Override
+    public void logout() {
+
+    }
+
+   /* private static Scope buildScope() {
         return Scope.build(Scope.R_BASICPROFILE, Scope.W_SHARE);
     }
 
@@ -117,6 +120,6 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-    }
+    }*/
 
 }

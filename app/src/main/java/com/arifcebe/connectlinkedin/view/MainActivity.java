@@ -3,24 +3,49 @@ package com.arifcebe.connectlinkedin.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.arifcebe.connectlinkedin.R;
+import com.arifcebe.connectlinkedin.presenter.MainPresenter;
 import com.arifcebe.connectlinkedin.view.iface.MainInterfac;
 import com.linkedin.platform.LISessionManager;
+import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity implements MainInterfac {
 
     private static final String TAG = "Main";
-    TextView jsonText;
+    private MainPresenter presenter;
+
+    private ImageView btnLogin,imgProfile;
+    private TextView name, headline;
+    private View mainContent;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+        presenter = new MainPresenter(this,this);
+
+        btnLogin = (ImageView) findViewById(R.id.main_btnClick);
+        imgProfile = (ImageView) findViewById(R.id.main_profile);
+        name = (TextView) findViewById(R.id.main_name);
+        headline = (TextView) findViewById(R.id.main_headline);
+        mainContent = findViewById(R.id.main_content);
+
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.getSessionLogin();
+            }
+        });
+
         /*try {
             PackageInfo info = getPackageManager().getPackageInfo(
                     "com.arifcebe.connectlinkedin",
@@ -36,32 +61,6 @@ public class MainActivity extends AppCompatActivity implements MainInterfac {
 
         }*/
 
-        /*jsonText = (TextView) findViewById(R.id.main_json);
-
-        Button btnClick = (Button) findViewById(R.id.main_btnClick);
-        btnClick.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LISessionManager.getInstance(getApplicationContext()).init(MainActivity.this, buildScope(), new AuthListener() {
-                    @Override
-                    public void onAuthSuccess() {
-                        // Authentication was successful.  You can now do
-                        // other calls with the SDK.
-                        Log.d(TAG, "success otentikasi");
-                        setUpdateState();
-                        Toast.makeText(getApplicationContext(), "success" + LISessionManager.getInstance(getApplicationContext()).getSession().getAccessToken().toString(), Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onAuthError(LIAuthError error) {
-                        // Handle authentication errors
-                        setUpdateState();
-                        Log.d(TAG, "failed otentikasi " + error.toString());
-                    }
-                }, true);
-            }
-        });*/
-
     }
 
     @Override
@@ -69,11 +68,24 @@ public class MainActivity extends AppCompatActivity implements MainInterfac {
         // Add this line to your existing onActivityResult() method
         LISessionManager.getInstance(getApplicationContext())
                 .onActivityResult(this, requestCode, resultCode, data);
-
     }
 
     @Override
     public void fetchProfile(JSONObject jo) {
+        Log.d(TAG,"result profile "+jo.toString());
+        try {
+            name.setText(jo.getString("firstName")+" "+jo.getString("lastName"));
+            headline.setText(jo.getString("publicProfileUrl"));
+            Picasso.with(this)
+                    .load(jo.getString("pictureUrl"))
+                    .into(imgProfile);
+
+            mainContent.setVisibility(View.VISIBLE);
+            btnLogin.setVisibility(View.GONE);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -86,40 +98,5 @@ public class MainActivity extends AppCompatActivity implements MainInterfac {
     public void logout() {
 
     }
-
-   /* private static Scope buildScope() {
-        return Scope.build(Scope.R_BASICPROFILE, Scope.W_SHARE);
-    }
-
-    private void setUpdateState() {
-        LISessionManager sessionManager = LISessionManager.getInstance(getApplicationContext());
-        LISession session = sessionManager.getSession();
-        boolean accessTokenValid = session.isValid();
-
-        if(accessTokenValid){
-            APIHelper apiHelper = APIHelper.getInstance(this);
-            apiHelper.getRequest(this, Webservice.getInstance().getGetUrlPeopleProfile(), new ApiListener() {
-                @Override
-                public void onApiSuccess(ApiResponse apiResponse) {
-                    Log.d(TAG,"result success "+apiResponse.getResponseDataAsJson().toString());
-                    JSONObject jo = apiResponse.getResponseDataAsJson();
-                    try {
-                        //String status = jo.getString("StatusCode");
-                        String name = jo.getString("firstName");
-                        jsonText.setText(name);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-
-                @Override
-                public void onApiError(LIApiError LIApiError) {
-                    jsonText.setText(LIApiError.getMessage().toString());
-                }
-            });
-        }
-
-    }*/
 
 }

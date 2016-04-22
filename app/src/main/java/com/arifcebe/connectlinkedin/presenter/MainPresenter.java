@@ -40,7 +40,8 @@ public class MainPresenter {
                     public void onAuthSuccess() {
                         // Authentication was successful.  You can now do
                         // other calls with the SDK.
-                        Log.d(TAG, "success otentikasi");
+                        Log.d(TAG, "success otentikasi "+LISessionManager.getInstance(context)
+                                .getSession().getAccessToken().toString());
                         setUpdateState();
                         Toast.makeText(context, "success"
                                 + LISessionManager.getInstance(context)
@@ -82,7 +83,7 @@ public class MainPresenter {
 
                 @Override
                 public void onApiError(LIApiError LIApiError) {
-                    //jsonText.setText(LIApiError.getMessage().toString());
+                    Toast.makeText(context,LIApiError.getMessage().toString(),Toast.LENGTH_LONG).show();
                 }
             });
         }
